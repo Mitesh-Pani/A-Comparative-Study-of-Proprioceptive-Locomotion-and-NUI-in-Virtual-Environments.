@@ -1,0 +1,51 @@
+using UnityEngine;
+
+public class LocomotionManager : MonoBehaviour
+{
+    public enum MovementType { Joystick, ArmSwing }
+    public MovementType activeMovement;
+
+    public float moveSpeed = 3.0f;
+    public Transform cameraRig;
+    public Transform leftHand, rightHand;
+
+    private Vector3 lastLeftPos, lastRightPos;
+
+    void Update()
+    {
+        if (activeMovement == MovementType.Joystick)
+        {
+            HandleJoystickMove();
+        }
+        else
+        {
+            HandleArmSwingMove();
+        }
+    }
+
+    void HandleJoystickMove()
+    {
+        float x = Input.GetAxis("Horizontal"); // Simplified for example
+        float z = Input.GetAxis("Vertical");
+        cameraRig.Translate(new Vector3(x, 0, z) * moveSpeed * Time.deltaTime);
+    }
+
+    void HandleArmSwingMove()
+    {
+        // Calculate velocity of hands relative to the head
+        float leftDist = Vector3.Distance(leftHand.localPosition, lastLeftPos);
+        float rightDist = Vector3.Distance(rightHand.localPosition, lastRightPos);
+        
+        float speed = (leftDist + rightDist) / Time.deltaTime;
+
+        if (speed > 0.5f) // Threshold to prevent drifting
+        {
+            Vector3 forward = Camera.main.transform.forward;
+            forward.y = 0; // Keep movement on the floor
+            cameraRig.position += forward * speed * moveSpeed * 0.1f * Time.deltaTime;
+        }
+
+        lastLeftPos = leftHand.localPosition;
+        lastRightPos = rightHand.localPosition;
+    }
+}
