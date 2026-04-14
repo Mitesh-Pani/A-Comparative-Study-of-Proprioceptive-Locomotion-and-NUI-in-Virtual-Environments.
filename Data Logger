@@ -1,0 +1,30 @@
+using UnityEngine;
+using System.IO;
+
+public class ResearchLogger : MonoBehaviour
+{
+    private float timer;
+    private float totalDistance;
+    private Vector3 lastPosition;
+
+    void Start()
+    {
+        lastPosition = transform.position;
+    }
+
+    void Update()
+    {
+        timer += Time.deltaTime;
+        totalDistance += Vector3.Distance(transform.position, lastPosition);
+        lastPosition = transform.position;
+    }
+
+    public void SaveResults(string participantID, string moveType)
+    {
+        string path = Application.persistentDataPath + "/ResearchData.csv";
+        string record = $"{participantID},{moveType},{timer},{totalDistance}\n";
+        
+        File.AppendAllText(path, record);
+        Debug.Log("Data Saved to: " + path);
+    }
+}
