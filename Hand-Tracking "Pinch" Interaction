@@ -1,0 +1,33 @@
+using UnityEngine;
+
+public class HandInteraction : MonoBehaviour
+{
+    public GameObject currentTarget;
+    
+    // This would be triggered by your Hand-Tracking SDK (e.g., Oculus/Meta)
+    public void OnPinchDown()
+    {
+        if (currentTarget != null)
+        {
+            // Logic for interacting with a maze door or switch
+            Debug.Log("Interacting with: " + currentTarget.name);
+            currentTarget.SendMessage("Activate", SendMessageOptions.DontRequireReceiver);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Interactable"))
+        {
+            currentTarget = other.gameObject;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject == currentTarget)
+        {
+            currentTarget = null;
+        }
+    }
+}
